@@ -307,24 +307,32 @@ class NativeDocumentOnBabylonjs extends EventTarget implements NativeDocument {
 }
 
 let currentDom: JSARDOM<NativeDocumentOnBabylonjs>;
+let lastLoadArgs: string[] = null;
 document.addEventListener('DOMContentLoaded', async () => {
   const canvas = document.getElementById('renderCanvas');
 
   window.addEventListener('message', async (event) => {
     const { data } = event;
     if (data?.command === 'load' && data.args?.length > 0) {
-      const firstArg = data.args[0];
-      const vfsUrlObject = new URL(firstArg);
-      const pathParam = decodeURIComponent(vfsUrlObject.searchParams.get('path'));
-      vfsOrigin = vfsUrlObject.origin;
-
-      const entryXsmlCode = await (await fetch(firstArg)).text();
-      await load(entryXsmlCode, pathParam);
+      await load(data.args);
+    } else if (data?.command === 'reload') {
+      await load(lastLoadArgs);
     }
   });
   vscode.postMessage({ command: 'ready' });
 
-  async function load(code: string, urlBase: string = 'https://example.com/') {
+  async function load(loadArgs: string[]) {
+    lastLoadArgs = loadArgs;
+    const firstArg = loadArgs[0];
+    const vfsUrlObject = new URL(firstArg);
+    const pathParam = decodeURIComponent(vfsUrlObject.searchParams.get('path'));
+    vfsOrigin = vfsUrlObject.origin;
+
+    const entryXsmlCode = await (await fetch(firstArg)).text();
+    await execute(entryXsmlCode, pathParam);
+  }
+
+  async function execute(code: string, urlBase: string = 'https://example.com/') {
     if (currentDom) {
       await currentDom.unload();
     }
@@ -334,5 +342,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       nativeDocument,
     });
     await currentDom.load();
+    await currentDom.waitForSpaceReady();
   }
 });

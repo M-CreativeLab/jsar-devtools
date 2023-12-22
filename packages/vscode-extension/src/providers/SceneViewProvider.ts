@@ -96,7 +96,11 @@ export default class SceneViewProvider extends EventTarget {
       }
     });
 
+    const sourceFilesWatcher = vscode.workspace.onDidSaveTextDocument(() => {
+      this.reload();
+    });
     this.panel.onDidDispose(() => {
+      sourceFilesWatcher.dispose();
       this.panel = null;
     });
   }
@@ -104,22 +108,6 @@ export default class SceneViewProvider extends EventTarget {
   private async readPackageManifest() {
     const manifestJson = await fsPromises.readFile(join(this.workspacePath, 'package.json'), 'utf8');
     return JSON.parse(manifestJson);
-  }
-
-  private async start(xsmlPath?: string) {
-    if (!xsmlPath) {
-      const manifest = await this.readPackageManifest();
-      if (!manifest.main) {
-        throw new TypeError(`failed to find the "main" from your package.json`);
-      }
-      xsmlPath = join(this.workspacePath, manifest.main);
-    }
-    this.cwd = dirname(xsmlPath);
-
-    this.reload(xsmlPath);
-    vscode.workspace.onDidSaveTextDocument(async () => {
-      this.reload(xsmlPath);
-    });
   }
 
   private load(filename: string) {
@@ -131,16 +119,14 @@ export default class SceneViewProvider extends EventTarget {
     });
   }
 
-  private reload(scriptSourceText: string) {
+  private reload() {
     if (!this.panel) {
+      vscode.window.showErrorMessage('Scene view is not opened.');
       return;
     }
     this.panel.webview.postMessage({
-      command: 'TransmuteWebGLInterface.OnExecuteScriptAsURI',
-      args: [{
-        Uri: correctVscodePath(scriptSourceText),
-        DestroyPresent: true,
-      }],
+      command: 'reload',
+      args: [],
     });
   }
 
