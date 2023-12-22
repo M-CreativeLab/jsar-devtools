@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Transmute VSCode Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "sourceMaps": true,
+      "args": [
+        "--crash-reporter-directory ${workspaceFolder}/.dump",
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode-extension",
+      ],
+      "outFiles": [
+        "${workspaceFolder}/packages/vscode-extension/dist/**/*.js"
+      ],
+      "preLaunchTask": "build-vscode-extension"
+    }
+  ]
+}
