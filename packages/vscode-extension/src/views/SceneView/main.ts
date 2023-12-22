@@ -195,15 +195,15 @@ class NativeDocumentOnBabylonjs extends EventTarget implements NativeDocument {
       'camera',
       Math.PI / 2,
       Math.PI / 2,
-      5,
+      2,
       BABYLON.Vector3.Zero(),
       this._scene
     );
-    // camera.upperRadiusLimit = 10;
+    camera.upperRadiusLimit = 5;
     camera.lowerRadiusLimit = 2;
     camera.wheelDeltaPercentage = 0.01;
 
-    camera.setPosition(new BABYLON.Vector3(0, 0, -5));
+    camera.setPosition(new BABYLON.Vector3(0, 0, -2.5));
     camera.setTarget(BABYLON.Vector3.Zero());
     camera.attachControl(canvas, false, true);
 
@@ -341,7 +341,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       url: urlBase,
       nativeDocument,
     });
+
     await currentDom.load();
+    const scene = currentDom.nativeDocument.getNativeScene();
+    const spaceNode = scene.rootNodes.find(node => node.name === 'space' && node instanceof BABYLON.TransformNode);
+    if (!(spaceNode instanceof BABYLON.TransformNode)) {
+      return;
+    } else {
+      spaceNode.setEnabled(false);
+    }
+
     await currentDom.waitForSpaceReady();
+    const boundingVectors = spaceNode.getHierarchyBoundingVectors(true);
+    const sceneSize = boundingVectors.max.subtract(boundingVectors.min);
+    const scalingRatio = Math.min(1 / sceneSize.x, 1 / sceneSize.y, 1 / sceneSize.z);
+    spaceNode.scaling = new BABYLON.Vector3(scalingRatio, scalingRatio, scalingRatio);
+    spaceNode.setEnabled(true);
   }
 });
