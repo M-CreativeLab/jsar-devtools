@@ -30,6 +30,7 @@
   "activationEvents": [],
   "enabledApiProposals": [],
   "main": "./dist/index.js",
+  "type": "commonjs",
   "icon": "res/images/logo-jsar.png",
   "vsce": {
     "dependencies": false
@@ -173,8 +174,8 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
-    "compile": "node ./tools/compile.js",
-    "package": "node ./tools/compile.js --package",
+    "compile": "node ./tools/compile.cjs",
+    "package": "node ./tools/compile.cjs --package",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "lint": "eslint src --ext ts",

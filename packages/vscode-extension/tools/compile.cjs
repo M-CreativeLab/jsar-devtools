@@ -29,16 +29,16 @@ async function shell(cmd) {
 async function buildExtension() {
   console.log('Building extension...');
   await shell(
-    `npx ncc build src/extension.ts ${nccFlags} --target es2015 --out dist`
+    `npx ncc build src/extension.ts ${nccFlags} --target es2020 --out dist`
   );
   // Install wasm files
-  await shell('node ./tools/install-wasm-deps.js');
+  await shell('node ./tools/install-wasm-deps.cjs');
 }
 
 async function buildLanguageServer() {
   console.log('Building language server...');
   await shell(
-    `npx ncc build src/processes/XsmlLanguageServerMain.ts ${nccFlags} --target es2015 --out dist/xsml-language-server`
+    `npx ncc build src/processes/XsmlLanguageServerMain.ts ${nccFlags} --target es2020 --out dist/xsml-language-server`
   );
 }
 

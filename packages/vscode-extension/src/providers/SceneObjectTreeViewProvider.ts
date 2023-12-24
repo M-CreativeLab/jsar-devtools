@@ -16,7 +16,6 @@ export class SceneObjectTreeItem extends vscode.TreeItem {
     const themePostfix = colorTheme === vscode.ColorThemeKind.Dark ? 'dark' : 'light';
 
     if (gameObject.type === 'Mesh') {
-      
       this.iconPath = vscode.Uri.joinPath(resourcePath, 'icons', `go-mesh-${themePostfix}.png`);
     } else if (gameObject.type === 'TransformNode') {
       this.iconPath = vscode.Uri.joinPath(resourcePath, 'icons', `go-transform-${themePostfix}.png`);
@@ -48,10 +47,9 @@ export default class SceneObjectTreeDataProvider implements vscode.TreeDataProvi
     this.resourcePath = vscode.Uri.joinPath(context.extensionUri, 'res');
 
     this.sceneViewProvider = ViewProviderManager.GetOrCreateSceneViewProvider(context);
-    this.sceneViewProvider.addEventListener('gameObjectsReady', () => {
+    this.sceneViewProvider.addEventListener('documentReady', async () => {
       this.treeChangeEvent.fire();
     });
-
   }
 
   public get onDidChangeTreeData(): vscode.Event<void> {
@@ -63,6 +61,12 @@ export default class SceneObjectTreeDataProvider implements vscode.TreeDataProvi
   }
 
   getChildren(element?: SceneObjectTreeItem): Thenable<SceneObjectTreeItem[]> {
+    const domApi = this.sceneViewProvider.cdpClient.rootSession.api.DOM;
+    domApi.getDocument()
+      .then(root => {
+        console.log(root);
+      });
+
     const children = this.sceneViewProvider.inspectGameObjects(element?.objectGuid)
       .map((go) => new SceneObjectTreeItem(go, this.resourcePath));
 

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 import fsPromises from 'node:fs/promises';
-import { correctVscodePath } from '../utils';
+import { cdp } from '@yodaos-jsar/dom';
 import VirtualFilesystem from '../services/VirtualFilesystem';
 
 export default class SceneViewProvider extends EventTarget {
@@ -23,6 +23,9 @@ export default class SceneViewProvider extends EventTarget {
    */
   private gameObjects: any[] = [];
 
+  cdpClient: ReturnType<typeof cdp.createRemoteClient>;
+  cdpTransport: cdp.LoopbackTransport;
+
   constructor(context: vscode.ExtensionContext) {
     super();
 
@@ -35,6 +38,17 @@ export default class SceneViewProvider extends EventTarget {
 
     this.context = context;
     this.resourcePath = vscode.Uri.joinPath(context.extensionUri, 'res');
+
+    const transport = this.cdpTransport = new cdp.LoopbackTransport();
+    transport.onDidSend((data) => {
+      if (this.panel) {
+        this.panel.webview.postMessage({
+          command: 'cdp',
+          args: [data],
+        });
+      }
+    });
+    this.cdpClient = cdp.createRemoteClient(transport);
   }
 
   /**
@@ -93,6 +107,10 @@ export default class SceneViewProvider extends EventTarget {
     this.panel.webview.onDidReceiveMessage((message) => {
       if (message?.command === 'ready') {
         this.load(entryPath);
+      } else if (message?.command === 'documentReady') {
+        this.dispatchEvent(new Event('documentReady'));
+      } else if (message?.command === 'cdp' && message.args?.[0]) {
+        this.cdpTransport.receive(message.args[0]);
       }
     });
 

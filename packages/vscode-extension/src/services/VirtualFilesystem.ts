@@ -1,6 +1,7 @@
 import * as http from 'node:http';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { platform } from 'node:os';
 
 let serverInstance: VirtualFilesystem = null;
 
@@ -56,7 +57,10 @@ export default class VirtualFilesystem {
       res.setHeader('Access-Control-Allow-Methods', '*');
 
       const url = new URL(req.url, 'http://localhost');
-      const filePath = url.searchParams.get('path');
+      let filePath = url.searchParams.get('path');
+      if (platform() === 'win32' && (filePath[0] === '/' || filePath[0] === '\\')) {
+        filePath = filePath.slice(1);
+      }
 
       let contentType = 'text/plain';
       if (filePath.endsWith('.js') || filePath.endsWith('.js.gz')) {

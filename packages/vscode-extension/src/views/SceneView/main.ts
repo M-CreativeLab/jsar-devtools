@@ -11,6 +11,7 @@ import {
   MediaPlayerConstructor,
   MediaPlayerBackend,
   JSARInputEvent,
+  cdp
 } from '@yodaos-jsar/dom';
 import 'babylonjs';
 
@@ -168,6 +169,7 @@ class NativeDocumentOnBabylonjs extends EventTarget implements NativeDocument {
   console: Console;
   attachedDocument: SpatialDocumentImpl;
   closed: boolean = false;
+  cdpTransport?: cdp.ITransport;
 
   private _scene: BABYLON.Scene;
   private _preloadMeshes: Map<string, Array<BABYLON.AbstractMesh | BABYLON.TransformNode>> = new Map();
@@ -181,14 +183,20 @@ class NativeDocumentOnBabylonjs extends EventTarget implements NativeDocument {
       defaultStylesheet: '',
       devicePixelRatio: 1,
     });
+    const cdpTransport = this.cdpTransport = new cdp.LoopbackTransport();
+    cdpTransport.onDidSend((data) => {
+      vscode.postMessage({
+        command: 'cdp',
+        args: [
+          data,
+        ],
+      });
+    });
     this.console = globalThis.console;
+
     const scene = this._scene = new BABYLON.Scene(this.engine);
     this._scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
     this._scene.debugLayer.hide();
-
-    const hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData(
-      'https://assets.babylonjs.com/environments/environmentSpecular.env', this._scene);
-    this._scene.environmentTexture = hdrTexture;
 
     // create camera and targets
     const camera = new BABYLON.ArcRotateCamera(
@@ -317,6 +325,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       await load(data.args);
     } else if (data?.command === 'reload') {
       await load(lastLoadArgs);
+    } else if (data?.command === 'cdp' && data.args?.[0]) {
+      const cdpTransport = currentDom.nativeDocument.cdpTransport as cdp.LoopbackTransport;
+      cdpTransport.receive(data.args[0]);
+      console.log('recived an CDP message', data.args[0]);
     }
   });
   vscode.postMessage({ command: 'ready' });
@@ -357,5 +369,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const scalingRatio = Math.min(1 / sceneSize.x, 1 / sceneSize.y, 1 / sceneSize.z);
     spaceNode.scaling = new BABYLON.Vector3(scalingRatio, scalingRatio, scalingRatio);
     spaceNode.setEnabled(true);
+    vscode.postMessage({ command: 'documentReady' });
   }
 });
