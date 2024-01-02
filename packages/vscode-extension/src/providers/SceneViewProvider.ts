@@ -8,7 +8,6 @@ export default class SceneViewProvider extends EventTarget {
   private context: vscode.ExtensionContext;
   private workspacePath: string;
   private openInWorkspace: boolean = true;
-  private cwd: string;
 
   /**
    * The extension's resource path
@@ -88,6 +87,7 @@ export default class SceneViewProvider extends EventTarget {
      * If the panel is already created, just show it.
      */
     if (this.panel != null) {
+      this.panel.reveal();
       this.load(entryPath);
       return;
     }
