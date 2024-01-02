@@ -1,11 +1,17 @@
 import * as vscode from 'vscode';
+import { ViewProviderManager } from './Manager';
 
 export default class InspectorViewProvider implements vscode.WebviewViewProvider {
   private webviewView: vscode.WebviewView;
 
+
   constructor(private context: vscode.ExtensionContext) { }
 
-  resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext<unknown>, token: vscode.CancellationToken): void | Thenable<void> {
+  resolveWebviewView(
+    webviewView: vscode.WebviewView,
+    _context: vscode.WebviewViewResolveContext<unknown>,
+    _token: vscode.CancellationToken
+  ): void | Thenable<void> {
     const { webview } = webviewView;
     const entryUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'res/js', 'inspector.js'));
 
@@ -42,7 +48,17 @@ export default class InspectorViewProvider implements vscode.WebviewViewProvider
     `
   }
 
-  inspect(gameObject) {
-    this.webviewView.webview.postMessage({ command: 'inspect', gameObject });
+  async inspect(elementToInspect) {
+    const sceneViewProvider = ViewProviderManager.GetSceneViewProvider();
+    if (sceneViewProvider) {
+      const { cdpClient } = sceneViewProvider;
+      const { node: spatialDescriptor } = await cdpClient.rootSession.api.SpatialDOM.describeElement({
+        nodeId: elementToInspect.nodeId,
+      });
+      if (spatialDescriptor != null) {
+        elementToInspect = { ...elementToInspect, ...spatialDescriptor };
+      }
+    }
+    this.webviewView?.webview.postMessage({ command: 'inspect', element: elementToInspect });
   }
 }

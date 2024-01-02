@@ -16,3 +16,11 @@ export function correctVscodePath(fsPath: string): string {
     return fsPath;
   }
 }
+
+export function attrsToMap(attrs: string[]): Map<string, string> {
+  const map = new Map<string, string>();
+  for (let i = 0; i < attrs.length; i += 2) {
+    map.set(attrs[i], attrs[i + 1]);
+  }
+  return map;
+}

@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 import SceneViewProvider from './SceneViewProvider';
-import SceneObjectTreeDataProvider from './SceneObjectTreeViewProvider';
+import ElementsTreeDataProvider from './ElementsTreeViewProvider';
 import InspectorViewProvider from './InspectorViewProvider';
 import { XsmlProvider } from './lsp/XsmlProvider';
 
 export class ViewProviderManager {
   private static sceneViewProvider: SceneViewProvider;
-  private static sceneObjectTreeDataProvider: SceneObjectTreeDataProvider;
+  private static elementsTreeDataProvider: ElementsTreeDataProvider;
   private static inspectorViewProvider: InspectorViewProvider;
   private static xsmlProvider: XsmlProvider;
 
@@ -21,15 +21,15 @@ export class ViewProviderManager {
     return this.sceneViewProvider;
   }
 
-  static GetOrCreateSceneObjectTreeDataProvider(context?: vscode.ExtensionContext) {
-    if (!this.sceneObjectTreeDataProvider) {
-      this.sceneObjectTreeDataProvider = new SceneObjectTreeDataProvider(context);
+  static GetOrCreateElementsTreeDataProvider(context?: vscode.ExtensionContext) {
+    if (!this.elementsTreeDataProvider) {
+      this.elementsTreeDataProvider = new ElementsTreeDataProvider(context);
     }
-    return this.sceneObjectTreeDataProvider;
+    return this.elementsTreeDataProvider;
   }
 
-  static GetSceneObjectTreeDataProvider() {
-    return this.sceneObjectTreeDataProvider;
+  static GetElementsTreeDataProvider() {
+    return this.elementsTreeDataProvider;
   }
 
   static GetOrCreateInspectorViewProvider(context?: vscode.ExtensionContext) {

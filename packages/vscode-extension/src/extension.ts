@@ -8,18 +8,18 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('jsar-devtools.packageProject', commands.packageProject),
     vscode.commands.registerCommand('jsar-devtools.showSceneView', commands.showSceneView),
     vscode.commands.registerCommand('jsar-devtools.openSelectedXsml', commands.openSceneViewWithSelected),
-    vscode.commands.registerCommand('jsar-devtools.inspectGameObject', commands.inspectElement),
+    vscode.commands.registerCommand('jsar-devtools.inspectElement', commands.inspectElement),
     vscode.commands.registerCommand('jsar-devtools.connectDevice', commands.connectDevice),
     vscode.commands.registerCommand('jsar-devtools.installToConnectedDevice', commands.installToConnectedDevice),
     vscode.commands.registerCommand('jsar-devtools.disableDeviceServer', commands.disableDevice),
     vscode.commands.registerCommand('jsar-devtools.openDocumentation', commands.openDocumentation),
 
     // Register tree typed views
-    vscode.window.registerTreeDataProvider('jsar-devtools.sceneObjectsHirarchy',
-      ViewProviderManager.GetOrCreateSceneObjectTreeDataProvider(context)),
+    vscode.window.registerTreeDataProvider('jsar-devtools.elementsHirarchy',
+      ViewProviderManager.GetOrCreateElementsTreeDataProvider(context)),
 
     // Register webview panel
-    vscode.window.registerWebviewViewProvider('jsar-devtools.sceneObjectInspector',
+    vscode.window.registerWebviewViewProvider('jsar-devtools.elementInspector',
       ViewProviderManager.GetOrCreateInspectorViewProvider(context)),
 
     // Register status bar

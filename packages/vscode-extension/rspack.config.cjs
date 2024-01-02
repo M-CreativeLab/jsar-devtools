@@ -3,7 +3,7 @@ module.exports = {
   mode: 'development',
   entry: {
     scene: './src/views/SceneView/main.ts',
-    inspector: './src/views/InspectorView.tsx',
+    inspector: './src/views/InspectorView/main.tsx',
   },
   output: {
     path: 'res/js',

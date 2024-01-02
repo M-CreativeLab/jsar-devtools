@@ -59,24 +59,12 @@
     ],
     "commands": [
       {
-        "command": "jsar-devtools.createSceneScript",
-        "title": "JSAR: Create a Scene Script"
-      },
-      {
         "command": "jsar-devtools.installTypeScriptDefinitions",
         "title": "JSAR: Install TypeScript Definitions"
       },
       {
-        "command": "jsar-devtools.setRokidOpenPlatformTokenManually",
-        "title": "JSAR: Update Rokid Open Platform Token"
-      },
-      {
         "command": "jsar-devtools.packageProject",
         "title": "JSAR: Package"
-      },
-      {
-        "command": "jsar-devtools.packageAndPublishProject",
-        "title": "JSAR: Package and Publish"
       },
       {
         "command": "jsar-devtools.installToConnectedDevice",
@@ -160,13 +148,13 @@
     "views": {
       "explorer": [
         {
-          "id": "jsar-devtools.sceneObjectsHirarchy",
-          "name": "Scene Hirarchy",
+          "id": "jsar-devtools.elementsHirarchy",
+          "name": "Elements Hirarchy",
           "type": "tree"
         },
         {
-          "id": "jsar-devtools.sceneObjectInspector",
-          "name": "Scene Object Inspector",
+          "id": "jsar-devtools.elementInspector",
+          "name": "Element Inspector",
           "type": "webview"
         }
       ]
@@ -224,6 +212,7 @@
     "@gltf-transform/extensions": "^3.5.1",
     "@vscode/l10n": "^0.0.16",
     "@vscode/webview-ui-toolkit": "^1.2.2",
+    "@yodaos-jsar/dom": "file:../../../jsar-dom",
     "antd": "^5.8.6",
     "draco3dgltf": "^1.5.6",
     "js-beautify": "^1.14.9",
