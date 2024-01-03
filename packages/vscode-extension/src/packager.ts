@@ -50,6 +50,7 @@ export default class Packager {
   #projectName: string;
   #projectVersion: string;
 
+  #outPath: string;
   #outStream: fs.WriteStream;
   #outArchive: archiver.Archiver;
 
@@ -69,7 +70,7 @@ export default class Packager {
       throw new TypeError(`package.json must contain a "version" field.`);
     }
 
-    this.#outStream = fs.createWriteStream(path.join(this.#projectRoot, `${this.#projectName}-${this.#projectVersion}.zip`));
+    this.#outPath = path.join(this.#projectRoot, `${this.#projectName}-${this.#projectVersion}.idp`);
     this.#outArchive = archiver('zip', {
       zlib: { level: 9 }
     });
@@ -90,9 +91,6 @@ export default class Packager {
     }
 
     const packageJson = this.#packageJson;
-    if (!packageJson.files || !Array.isArray(packageJson.files) || packageJson.files.length === 0) {
-      throw new TypeError(`package.json must contain a "files" array and must include your source files.`);
-    }
     if (!packageJson.main) {
       throw new TypeError(`package.json must contain a "main" field.`);
     }
@@ -105,11 +103,16 @@ export default class Packager {
     onProgressChange(10, 'Generated small glb file.');
 
     // Add files to the archive
-    let files = (packageJson.files as string[])
+    let files = ((packageJson.files || []) as string[])
       .reduce((files, globPattern) => {
         const matches = glob.sync(correctVscodePath(`${this.#projectRoot}/${globPattern}`));
         return files.concat(matches);
       }, [] as string[]);
+
+    // Append the main file if not present.
+    if (!files.includes(packageJson.main)) {
+      files.push(path.join(this.#projectRoot, packageJson.main));
+    }
 
     // Append the package.json if not present.
     if (!files.includes('package.json')) {
@@ -156,13 +159,13 @@ export default class Packager {
   }
 
   async save(): Promise<string> {
-    console.info(`Start saving to ${this.#outStream.path}...`);
+    console.info(`Start saving to ${this.#outPath}...`);
     return new Promise<string>((resolve, reject) => {
-      this.#outArchive.pipe(this.#outStream)
+      this.#outArchive.pipe(fs.createWriteStream(this.#outPath))
         .once('error', reject)
         .once('finish', () => {
           console.info('Saved.');
-          resolve(this.#outStream.path as string);
+          resolve(this.#outPath);
         });
     });
   }
