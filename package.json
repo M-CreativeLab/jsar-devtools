@@ -5,7 +5,7 @@
     "packages/vscode-extension"
   ],
   "dependencies": {
-    "@yodaos-jsar/dom": "file:../jsar-dom",
+    "@yodaos-jsar/dom": "daily",
     "babylonjs": "^6.10.0"
   },
   "devDependencies": {
