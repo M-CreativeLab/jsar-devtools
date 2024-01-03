@@ -21,7 +21,7 @@ jobs:
       with:
         node-version: 18.16.0
     - name: Install Node.js dependencies
-      run: npm ci
+      run: npm install
     - name: Build
       working-directory: packages/vscode-extension
       run: |
