@@ -23,6 +23,6 @@ jobs:
     - name: Install Node.js dependencies
       run: npm ci
     - name: Build
-      cwd: packages/vscode-extension
+      working-directory: packages/vscode-extension
       run: |
         npx vsce package

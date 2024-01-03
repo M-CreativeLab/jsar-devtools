@@ -26,7 +26,7 @@ jobs:
     - name: Install Node.js dependencies
       run: npm ci
     - name: Build release ${{ github.event.inputs.version }}
-      cwd: packages/vscode-extension
+      working-directory: packages/vscode-extension
       run: |
         if [ "${{ github.event.inputs.isRelease }}" != "yes" ]; then
           node ./version.cjs
