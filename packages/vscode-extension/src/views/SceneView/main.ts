@@ -13,6 +13,7 @@ import {
   JSARInputEvent,
   cdp
 } from '@yodaos-jsar/dom';
+import ImageDataImpl from '@yodaos-jsar/dom/src/living/image/ImageData';
 import 'babylonjs';
 
 declare var acquireVsCodeApi: () => {
@@ -154,6 +155,9 @@ class UserAgentOnBabylonjs implements UserAgent {
   }
   vibrate(pattern: VibratePattern): boolean {
     return navigator.vibrate(pattern);
+  }
+  getWebSocketConstructor(): typeof WebSocket {
+    return globalThis.WebSocket;
   }
   getMediaPlayerConstructor(): MediaPlayerConstructor {
     return AudioPlayerOnBabylonjs;
@@ -303,6 +307,31 @@ class NativeDocumentOnBabylonjs extends EventTarget implements NativeDocument {
   }
   createBoundTransformNode(nameOrId: string): BABYLON.TransformNode {
     throw new Error('Method not implemented.');
+  }
+  createImageBitmap(image: ArrayBuffer | ArrayBufferView): Promise<ImageBitmap> {
+    return window.createImageBitmap(new Blob([image]));
+  }
+  decodeImage(bitmap: ImageBitmap, size?: [number, number]): Promise<ImageDataImpl> {
+    let expectedWidth = size[0];
+    let expectedHeight = size[1];
+    if (typeof expectedWidth !== 'number') {
+      expectedWidth = bitmap.width;
+    }
+    if (typeof expectedHeight !== 'number') {
+      expectedHeight = bitmap.height;
+    }
+
+    const offscreenCanvas = new window.OffscreenCanvas(expectedWidth, expectedHeight);
+    const ctx = offscreenCanvas.getContext('2d');
+    ctx?.drawImage(
+      bitmap,
+      0, 0,
+      bitmap.width, bitmap.height,
+      0, 0,
+      offscreenCanvas.width, offscreenCanvas.height
+    );
+    const imageData = ctx?.getImageData(0, 0, offscreenCanvas.width, offscreenCanvas.height) as unknown as ImageDataImpl;
+    return Promise.resolve(imageData);
   }
   stop(): void {
     // TODO
