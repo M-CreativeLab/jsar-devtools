@@ -386,8 +386,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     rotateCameraBtn.addEventListener('mousedown', (e) => {
       isCameraRotatable = true;
     });
-    rotateCameraBtn.addEventListener('mouseup', (e) => {
-      isCameraRotatable = false;
+    window.addEventListener('mouseup', (e) => {
+      if (isCameraRotatable === true) {
+        isCameraRotatable = false;
+      }
     });
     rotateCameraBtn.addEventListener('mousemove', (e: MouseEvent) => {
       if (isCameraRotatable === true && currentDom) {
