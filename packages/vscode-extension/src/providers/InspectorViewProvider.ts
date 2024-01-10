@@ -60,5 +60,15 @@ export default class InspectorViewProvider implements vscode.WebviewViewProvider
       }
     }
     this.webviewView?.webview.postMessage({ command: 'inspect', element: elementToInspect });
+
+    /**
+     * Send the selection event to the CDP
+     */
+    if (sceneViewProvider) {
+      const { cdpClient } = sceneViewProvider;
+      await cdpClient.rootSession.api.SpatialDOM.highlightElement({
+        nodeId: elementToInspect.nodeId,
+      });
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import React, { useState, useEffect, type CSSProperties } from 'react';
-import { ConfigProvider, Collapse, ColorPicker, Form, Input, theme } from 'antd';
+import { ConfigProvider, Collapse, ColorPicker, Form, Input, theme, Switch, Divider } from 'antd';
 import * as jsardom from '@yodaos-jsar/dom';
 import { attrsToMap } from '../../utils';
 
@@ -76,6 +76,12 @@ function ColorAttribute(props) {
   }></TextLine>;
 }
 
+function SwitchAttribute(props) {
+  return <TextLine label={props.label} value={
+    <Switch size="small" checked={props.value} onChange={props.onChange} disabled />
+  }></TextLine>;
+}
+
 function InspectorPanel() {
   const [selectedElement, setSelectedElement] = useState(null);
 
@@ -94,7 +100,6 @@ function InspectorPanel() {
   if (selectedElement == null) {
     return <div style={{ padding: '12px' }}>No object is selected.</div>;
   } else {
-    console.log(selectedElement);
     const panels: React.JSX.Element[] = [
       <Collapse.Panel header="General" key="general">
         <TextLine label="Name" value={selectedElement.nodeName} />
@@ -144,6 +149,11 @@ function InspectorPanel() {
           <TextLine label="Has UV3" value={mesh.hasUv2 ? 'Yes' : 'No'} />
           <TextLine label="Has UV4" value={mesh.hasUv3 ? 'Yes' : 'No'} />
           <TextLine label="Has UV5" value={mesh.hasUv4 ? 'Yes' : 'No'} />
+          <Divider orientation='left'></Divider>
+          <SwitchAttribute label="Display Normals" value={false} />
+          <SwitchAttribute label="Display Vertex Normals" value={false} />
+          <SwitchAttribute label="Display Bones" value={false} />
+          <SwitchAttribute label="Render Wireframe over Mesh" value={false} />
         </Collapse.Panel>
       );
     }

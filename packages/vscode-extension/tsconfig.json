@@ -7,8 +7,8 @@
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
 		"types": [
-            "node",
-        ],
+			"node",
+		],
 		"jsx": "react-jsx",
 		"sourceMap": true
 	}
