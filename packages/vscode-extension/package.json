@@ -130,11 +130,6 @@
           "when": "explorerResourceIsFolder && !explorerResourceIsFile",
           "command": "jsar-devtools.packageProject",
           "group": "z_commands"
-        },
-        {
-          "when": "explorerResourceIsFolder && !explorerResourceIsFile",
-          "command": "jsar-devtools.packageAndPublishProject",
-          "group": "z_commands"
         }
       ],
       "touchBar": [

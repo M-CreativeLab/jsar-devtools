@@ -151,6 +151,17 @@ export default class SceneViewProvider extends EventTarget {
   private getWebviewContent(): string {
     const sceneJsPath = this.panel.webview.asWebviewUri(
       vscode.Uri.joinPath(this.resourcePath, 'js/scene.js'));
+    // icons of scene controls
+    const resetSceneIconPath = this.panel.webview.asWebviewUri(
+      vscode.Uri.joinPath(this.resourcePath, 'icons/scene-reset.png'));
+    const reloadSceneIconPath = this.panel.webview.asWebviewUri(
+      vscode.Uri.joinPath(this.resourcePath, 'icons/scene-reload.png'));
+    // icons of camera controls
+    const rotateCameraIconPath = this.panel.webview.asWebviewUri(
+      vscode.Uri.joinPath(this.resourcePath, 'icons/axis-ratation.png'));
+    const zoomCameraIconPath = this.panel.webview.asWebviewUri(
+      vscode.Uri.joinPath(this.resourcePath, 'icons/scene-zoom.png'));
+
     return `
 <!DOCTYPE html>
 <html lang="en">
@@ -159,6 +170,10 @@ export default class SceneViewProvider extends EventTarget {
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <script src="${sceneJsPath}"></script>
     <style>
+      :root {
+        --scene-icon-size: 30px;
+      }
+
       html,
       body {
         overflow: hidden;
@@ -177,11 +192,78 @@ export default class SceneViewProvider extends EventTarget {
         height: 100%;
         touch-action: none;
       }
+
+      #fullscreen-controls button {
+        background-color: transparent;
+        border: 0;
+        cursor: pointer;
+      }
+      #fullscreen-controls button>img {
+        opacity: 0.75;
+        transition: opacity 0.3s;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-drag: none;
+      }
+      #fullscreen-controls button:active>img {
+        opacity: 1;
+      }
+
+      #fullscreen-controls>section {
+        z-index: 100;
+      }
+      #fullscreen-controls>.controls {
+        position: fixed;
+        display: flex;
+        gap: 3px;
+        padding: 3px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+        transition: background-color 0.3s;
+      }
+      #fullscreen-controls>.controls:hover {
+        background-color: rgba(255, 255, 255, 0.25);
+      }
+      #scene-controls {
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        flex-direction: row;
+      }
+      #scene-controls button, #scene-controls button>img {
+        height: var(--scene-icon-size);
+        width: fit-content;
+      }
+      #camera-controls {
+        right: 5px;
+        top: 20%;
+        transform: translateY(-50%);
+        flex-direction: column;
+      }
+      #camera-controls button, #camera-controls button>img {
+        height: fit-content;
+        width: var(--scene-icon-size);
+      }
     </style>
   </head>
   <body>
     <div id="babylonjs-root">
       <canvas id="renderCanvas"></canvas>
+      <div id="fullscreen-controls">
+        <section id="scene-controls" class="controls">
+          <button id="reset-scene">
+            <img src="${resetSceneIconPath}" />
+          </button>
+          <button id="reload-scene">
+            <img src="${reloadSceneIconPath}" />
+          </button>
+        </section>
+        <section id="camera-controls" class="controls">
+          <button id="rotate-camera">
+            <img src="${rotateCameraIconPath}" />
+          </button>
+        </section>
+      </div>
     </div>
   </body>
 </html>

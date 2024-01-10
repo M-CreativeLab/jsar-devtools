@@ -217,11 +217,11 @@ class NativeDocumentOnBabylonjs extends EventTarget implements NativeDocument {
 
     camera.setPosition(new BABYLON.Vector3(0, 0, -2.5));
     camera.setTarget(BABYLON.Vector3.Zero());
-    camera.attachControl(canvas, false, true);
 
     const light = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(0, 2, -5), this._scene);
     light.intensity = 0.7;
 
+    this.engine.setHardwareScalingLevel(1 / window.devicePixelRatio);
     this.engine.runRenderLoop(() => {
       this._scene.render();
     });
@@ -361,6 +361,56 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
   vscode.postMessage({ command: 'ready' });
+
+  {
+    // add event listeners for controls
+    const resetSceneBtn = document.querySelector('button#reset-scene');
+    const reloadSceneBtn = document.querySelector('button#reload-scene');
+    const rotateCameraBtn = document.querySelector('button#rotate-camera');
+
+    resetSceneBtn.addEventListener('click', () => {
+      if (currentDom) {
+        const scene = currentDom.nativeDocument.getNativeScene();
+        const camera = scene.activeCamera;
+        if (camera instanceof BABYLON.ArcRotateCamera) {
+          camera.setPosition(new BABYLON.Vector3(0, 0, -2.5));
+        }
+      }
+    });
+    reloadSceneBtn.addEventListener('click', () => {
+      load(lastLoadArgs);
+    });
+
+    // Camera Rotation
+    let isCameraRotatable = false;
+    rotateCameraBtn.addEventListener('mousedown', (e) => {
+      isCameraRotatable = true;
+    });
+    rotateCameraBtn.addEventListener('mouseup', (e) => {
+      isCameraRotatable = false;
+    });
+    rotateCameraBtn.addEventListener('mousemove', (e: MouseEvent) => {
+      if (isCameraRotatable === true && currentDom) {
+        const scene = currentDom.nativeDocument.getNativeScene();
+        const camera = scene.activeCamera;
+        if (camera instanceof BABYLON.ArcRotateCamera) {
+          camera.alpha -= e.movementX * 0.1;
+          camera.beta -= e.movementY * 0.1;
+        }
+      }
+    });
+
+    // Zoom in/out
+    window.addEventListener('wheel', (e: WheelEvent) => {
+      if (currentDom) {
+        const scene = currentDom.nativeDocument.getNativeScene();
+        const camera = scene.activeCamera;
+        if (camera instanceof BABYLON.ArcRotateCamera) {
+          camera.radius -= e.deltaY * 0.01;
+        }
+      }
+    });
+  }
 
   async function load(loadArgs: string[]) {
     lastLoadArgs = loadArgs;
