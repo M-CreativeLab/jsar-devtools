@@ -19,6 +19,21 @@ export default class InspectorViewProvider implements vscode.WebviewViewProvider
     };
     webview.html = this.getWebviewContent(entryUri);
     this.webviewView = webviewView;
+    this.webviewView.webview.onDidReceiveMessage(async (message) => {
+      const sceneViewProvider = ViewProviderManager.GetSceneViewProvider();
+      if (sceneViewProvider) {
+        const { cdpClient } = sceneViewProvider;
+        const { command, args } = message;
+        if (command === 'cdp.SpatialDOM.setTransform') {
+          cdpClient.rootSession.api.SpatialDOM.setTransform({
+            nodeId: args[0],
+            transform: args[1],
+          });
+        } else {
+          console.warn(`Unknown command: ${command}`);
+        }
+      }
+    });
   }
 
   getWebviewContent(scriptUri: vscode.Uri): string {

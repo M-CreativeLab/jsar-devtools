@@ -3,6 +3,12 @@ import React, { useState, useEffect, type CSSProperties } from 'react';
 import { ConfigProvider, Collapse, ColorPicker, Form, Input, theme, Switch, Divider } from 'antd';
 import * as jsardom from '@yodaos-jsar/dom';
 import { attrsToMap } from '../../utils';
+import { useForm } from 'antd/es/form/Form';
+
+declare var acquireVsCodeApi: () => {
+  postMessage(message: any): void;
+};
+let vscode = acquireVsCodeApi();
 
 function nodeTypeToString(nodeType: number): string {
   switch (nodeType) {
@@ -36,6 +42,7 @@ function TextLine(props) {
 }
 
 function Vector3Attribute(props) {
+  const [form] = useForm();
   const { x = 0, y = 0, z = 0 } = props.value || {};
   const formItemStyle: CSSProperties = {
     height: 'fit-content',
@@ -46,16 +53,37 @@ function Vector3Attribute(props) {
 
   const value = (
     <Form
+      form={form}
       layout="inline"
+      initialValues={{ x, y, z }}
+      disabled={props.readOnly}
+      onChange={() => {
+        let { x, y, z } = form.getFieldsValue();
+        x = parseFloat(x);
+        y = parseFloat(y);
+        z = parseFloat(z);
+        if (isNaN(x)) {
+          x = 0;
+        }
+        if (isNaN(y)) {
+          y = 0;
+        }
+        if (isNaN(z)) {
+          z = 0;
+        }
+        if (typeof props.onChange === 'function') {
+          props.onChange({ x, y, z });
+        }
+      }}
     >
-      <Form.Item label="X" style={formItemStyle}>
-        <Input size="small" style={inputStyle} value={x} readOnly />
+      <Form.Item label="X" name="x" style={formItemStyle}>
+        <Input size="small" style={inputStyle} readOnly={props.readOnly} />
       </Form.Item>
-      <Form.Item label="Y" style={formItemStyle}>
-        <Input size="small" style={inputStyle} value={y} readOnly />
+      <Form.Item label="Y" name="y" style={formItemStyle}>
+        <Input size="small" style={inputStyle} readOnly={props.readOnly} />
       </Form.Item>
-      <Form.Item label="Z" style={formItemStyle}>
-        <Input size="small" style={inputStyle} value={z} readOnly />
+      <Form.Item label="Z" name="z" style={formItemStyle}>
+        <Input size="small" style={inputStyle} readOnly={props.readOnly} />
       </Form.Item>
     </Form>
   );
@@ -126,11 +154,26 @@ function InspectorPanel() {
 
     if (selectedElement.transform) {
       const { transform } = selectedElement;
+      const createTransformPropertyUpdater = (name: 'position' | 'rotation' | 'scaling') => {
+        return (value) => {
+          if (typeof value === 'object') {
+            vscode.postMessage({
+              command: 'cdp.SpatialDOM.setTransform',
+              args: [
+                selectedElement.nodeId,
+                {
+                  [name]: value,
+                }
+              ],
+            });
+          }
+        };
+      };
       panels.push(
         <Collapse.Panel header="Transform" key="transform">
-          <Vector3Attribute label="Position" value={transform.position} />
-          <Vector3Attribute label="Rotation" value={transform.rotation} />
-          <Vector3Attribute label="Scale" value={transform.scaling} />
+          <Vector3Attribute label="Position" value={transform.position} onChange={createTransformPropertyUpdater('position')} />
+          <Vector3Attribute label="Rotation" value={transform.rotation} readOnly />
+          <Vector3Attribute label="Scale" value={transform.scaling} onChange={createTransformPropertyUpdater('scaling')} />
         </Collapse.Panel>
       )
     }
