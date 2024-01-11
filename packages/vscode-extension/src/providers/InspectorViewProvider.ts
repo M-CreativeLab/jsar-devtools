@@ -4,7 +4,6 @@ import { ViewProviderManager } from './Manager';
 export default class InspectorViewProvider implements vscode.WebviewViewProvider {
   private webviewView: vscode.WebviewView;
 
-
   constructor(private context: vscode.ExtensionContext) { }
 
   resolveWebviewView(
@@ -66,6 +65,7 @@ export default class InspectorViewProvider implements vscode.WebviewViewProvider
      */
     if (sceneViewProvider) {
       const { cdpClient } = sceneViewProvider;
+      await cdpClient.rootSession.api.SpatialDOM.unhighlightElements();
       await cdpClient.rootSession.api.SpatialDOM.highlightElement({
         nodeId: elementToInspect.nodeId,
       });
