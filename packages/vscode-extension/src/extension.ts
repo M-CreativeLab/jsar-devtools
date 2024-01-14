@@ -19,8 +19,12 @@ export async function activate(context: vscode.ExtensionContext) {
       ViewProviderManager.GetOrCreateElementsTreeDataProvider(context)),
 
     // Register webview panel
+    vscode.window.registerWebviewViewProvider('jsar-devtools.console',
+      ViewProviderManager.GetOrCreateConsoleViewProvider(context)),
     vscode.window.registerWebviewViewProvider('jsar-devtools.elementInspector',
       ViewProviderManager.GetOrCreateInspectorViewProvider(context)),
+    vscode.window.registerWebviewViewProvider('jsar-devtools.webxr.emulator',
+      ViewProviderManager.GetOrCreateXREmulatorViewProvider(context)),
 
     // Register status bar
     (() => {

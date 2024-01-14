@@ -3,7 +3,9 @@ module.exports = {
   mode: 'development',
   entry: {
     scene: './src/views/SceneView/main.ts',
+    console: './src/views/ConsoleView/main.tsx',
     inspector: './src/views/InspectorView/main.tsx',
+    'xr-emulator': './src/views/XREmulatorView/main.tsx',
   },
   output: {
     path: 'res/js',
@@ -12,6 +14,16 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        test: /\.css$/i,
+        use: [
+          'style-loader',
+          'css-loader',
+        ],
+        resolve: {
+          preferRelative: true,
+        },
+      },
       {
         test: /\.m?js$/,
         resolve: {
@@ -33,5 +45,8 @@ module.exports = {
         type: 'javascript/auto',
       }
     ]
-  }
+  },
+  experiments: {
+    css: false,
+  },
 };
