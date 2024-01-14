@@ -9,9 +9,6 @@ import { DEFAULT_TRANSFORMS, TRIGGER_MODES } from './core/constants';
 import {
   changeEmulatedDeviceType,
   notifyExitImmersive,
-  reloadInspectedTab,
-  togglePolyfill,
-  toggleStereoMode,
 } from './core/messenger';
 
 import { DEVICE_DEFINITIONS } from './core/devices';
@@ -19,9 +16,6 @@ import { EmulatorSettings } from './core/emulator-states';
 
 export function HeadsetBar({ device }) {
   const headsetSelectRef = React.useRef<any>();
-  const polyfillToggleRef = React.useRef<HTMLElement>();
-  const stereoToggleRef = React.useRef<HTMLElement>();
-  const [polyfillOn, setPolyfillOn] = React.useState(true);
   const [showDropDown, setShowDropDown] = React.useState(false);
   const [triggerMode, setTriggerMode] = React.useState(
     EmulatorSettings.instance.triggerMode,
@@ -36,54 +30,8 @@ export function HeadsetBar({ device }) {
     }
   }
 
-  function onToggleStereo() {
-    EmulatorSettings.instance.stereoOn = !EmulatorSettings.instance.stereoOn;
-    toggleStereoMode(EmulatorSettings.instance.stereoOn);
-    stereoToggleRef.current.classList.toggle(
-      'button-pressed',
-      EmulatorSettings.instance.stereoOn,
-    );
-    EmulatorSettings.instance.write();
-  }
-
-  const updatePolyfillState = (tab) => {
-    const url = new URL(tab.url);
-    const urlMatchPattern = url.origin + '/*';
-    setPolyfillOn(
-      !EmulatorSettings.instance.polyfillExcludes.has(urlMatchPattern),
-    );
-  };
-
-  React.useEffect(() => {
-    // check every time navigation happens on the tab
-    // chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    //   if (
-    //     tabId === chrome.devtools.inspectedWindow.tabId &&
-    //     changeInfo.status === 'complete'
-    //   ) {
-    //     updatePolyfillState(tab);
-    //   }
-    // });
-
-    // check on start up
-    // chrome.tabs.get(chrome.devtools.inspectedWindow.tabId, (tab) => {
-    //   updatePolyfillState(tab);
-    // });
-  });
-
   return (
     <div className="card headset-card">
-      <div
-        style={{
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          zIndex: 10,
-          position: 'fixed',
-          height: (polyfillOn ? 0 : 100) + 'vh',
-          width: '100vw',
-          left: 0,
-          top: 0,
-        }}
-      ></div>
       <div className="card-body">
         <div className="row">
           <div className="col-4 d-flex justify-content-start align-items-center">
@@ -104,33 +52,6 @@ export function HeadsetBar({ device }) {
           </div>
           <div className="col-8 d-flex justify-content-end align-items-center">
             <div className="control-button-group">
-              <button
-                className={
-                  'btn headset-action-button' +
-                  (polyfillOn ? ' button-pressed' : '')
-                }
-                ref={element => polyfillToggleRef.current = element}
-                onClick={togglePolyfill}
-                style={{ zIndex: 11, position: 'relative' }}
-              >
-                <img
-                  src="./res/icons/xr-emulator/polyfill-on.png"
-                  className="action-icon"
-                />
-                Polyfill
-              </button>
-              <button
-                className={
-                  EmulatorSettings.instance.stereoOn
-                    ? 'btn headset-action-button button-pressed'
-                    : 'btn headset-action-button'
-                }
-                ref={element => stereoToggleRef.current = element}
-                onClick={onToggleStereo}
-              >
-                <img src="./res/icons/xr-emulator/stereo.png" className="action-icon" />
-                Stereo
-              </button>
               <button
                 className="btn headset-action-button"
                 onClick={notifyExitImmersive}
@@ -185,23 +106,10 @@ export function HeadsetBar({ device }) {
                 <button
                   className="btn special-button"
                   onClick={() => {
-                    EmulatorSettings.instance.clear().then(() => {
-                      location.reload();
-                      reloadInspectedTab();
-                    });
+                    EmulatorSettings.instance.clear();
                   }}
                 >
                   Clear all settings
-                </button>
-                <button
-                  className="btn special-button"
-                  onClick={() => {
-                    // chrome.tabs.create({
-                    //   url: 'https://chrome.google.com/webstore/detail/immersive-web-emulator/cgffilbpcibhmcfbgggfhfolhkfbhmik',
-                    // });
-                  }}
-                >
-                  version - 0.0.1
                 </button>
               </div>
             )}

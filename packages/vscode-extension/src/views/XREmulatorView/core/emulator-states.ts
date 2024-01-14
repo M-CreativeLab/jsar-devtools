@@ -75,7 +75,7 @@ export const emulatorStates = {
 };
 
 export class EmulatorSettings {
-  static _instance = null;
+  static _instance: EmulatorSettings = null;
   static get instance() {
     if (!EmulatorSettings._instance) {
       EmulatorSettings._instance = new EmulatorSettings();
@@ -99,7 +99,7 @@ export class EmulatorSettings {
     this.stereoOn = false;
     this.actionMappingOn = true;
     this.defaultPose = DEFAULT_TRANSFORMS;
-    this.deviceKey = 'Meta Quest 3';
+    this.deviceKey = 'Rokid Max Pro';
     this.keyboardMappingOn = true;
     this.roomDimension = { x: 6, y: 3, z: 6 };
     this.polyfillExcludes = new Set();
