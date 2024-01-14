@@ -19,18 +19,21 @@ export default class ConsoleViewProvider implements vscode.WebviewViewProvider {
     };
     webview.html = this.getWebviewContent(entryUri);
     this.webviewView = webviewView;
+
+    let isLogEntryWatched = false;
     this.webviewView.webview.onDidReceiveMessage(async (message) => {
-      const sceneViewProvider = ViewProviderManager.GetSceneViewProvider();
-      if (sceneViewProvider) {
-        const { cdpClient } = sceneViewProvider;
-        const { command, args } = message;
-        if (command === 'cdp.SpatialDOM.setTransform') {
-          cdpClient.rootSession.api.SpatialDOM.setTransform({
-            nodeId: args[0],
-            transform: args[1],
-          });
-        } else {
-          console.warn(`Unknown command: ${command}`);
+      if (message?.command === 'ready') {
+        const sceneViewProvider = ViewProviderManager.GetSceneViewProvider();
+        if (sceneViewProvider) {
+          const { cdpClient } = sceneViewProvider;
+          if (!isLogEntryWatched) {
+            cdpClient.rootSession.api.Log.onEntryAdded((params) => {
+              webview.postMessage(params.entry);
+            });
+            isLogEntryWatched = true;
+          }
+          await cdpClient.rootSession.api.Log.enable();
+          console.info(`Start listening to console logs`);
         }
       }
     });
