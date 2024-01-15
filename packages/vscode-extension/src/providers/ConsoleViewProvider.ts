@@ -23,13 +23,23 @@ export default class ConsoleViewProvider implements vscode.WebviewViewProvider {
     _token: vscode.CancellationToken
   ): void | Thenable<void> {
     const { webview } = webviewView;
-    const entryUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'res/js', 'console.js'));
+    this.webviewView = webviewView;
 
+    const entryUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'res/js', 'console.js'));
     webview.options = {
       enableScripts: true,
     };
     webview.html = this.getWebviewContent(entryUri);
-    this.webviewView = webviewView;
+    webview.onDidReceiveMessage((data) => {
+      if (data.command === 'ready' && this.lastLogEntries.length > 0) {
+        for (const entry of this.lastLogEntries) {
+          webview.postMessage({
+            command: 'logEntryAdded',
+            args: [entry],
+          });
+        }
+      }
+    });
   }
 
   getWebviewContent(scriptUri: vscode.Uri): string {
