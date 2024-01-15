@@ -1,5 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import React, { useState } from 'react';
+import './console.css';
 
 declare var acquireVsCodeApi: () => {
   postMessage(message: any): void;
@@ -20,26 +21,18 @@ function App() {
   React.useEffect(() => {
     vscode.postMessage({ command: 'ready' });
     function onMessage(event: MessageEvent) {
-      const log = event.data;
-      setLogs(logs => [...logs, log]);
+      const data = event.data || {};
+      if (data.command === 'logEntryAdded') {
+        setLogs(logs => [...logs, data.args[0]]);
+      } else if (data.command === 'clear') {
+        setLogs([]);
+      }
     }
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
   }, []);
-  return <div style={{
-    width: '100%',
-    height: '100%',
-    overflow: 'auto',
-    padding: '10px',
-  }}>
-    <ul style={{
-      listStyle: 'none',
-      padding: '5px 30px',
-      margin: 0,
-      fontFamily: 'monospace',
-      fontSize: '12px',
-      lineHeight: '1.5em',
-    }}>
+  return <div id="app">
+    <ul id="logs">
       {logs.map(log => <li key={log.timestamp} className={log.level}>
         <span className="text">{log.text}</span>
       </li>)}

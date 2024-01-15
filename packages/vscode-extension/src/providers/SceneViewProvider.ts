@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import fsPromises from 'node:fs/promises';
 import { cdp } from '@yodaos-jsar/dom';
 import VirtualFilesystem from '../services/VirtualFilesystem';
+import { ViewProviderManager } from './Manager';
 
 export default class SceneViewProvider extends EventTarget {
   private context: vscode.ExtensionContext;
@@ -130,6 +131,9 @@ export default class SceneViewProvider extends EventTarget {
   }
 
   private load(filename: string) {
+    ViewProviderManager
+      .GetOrCreateConsoleViewProvider()
+      .clear();
     this.panel.webview.postMessage({
       command: 'load',
       args: [
@@ -143,6 +147,9 @@ export default class SceneViewProvider extends EventTarget {
       vscode.window.showErrorMessage('Scene view is not opened.');
       return;
     }
+    ViewProviderManager
+      .GetOrCreateConsoleViewProvider()
+      .clear();
     this.panel.webview.postMessage({
       command: 'reload',
       args: [],

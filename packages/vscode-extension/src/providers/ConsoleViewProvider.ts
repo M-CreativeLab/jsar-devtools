@@ -4,11 +4,16 @@ import { ViewProviderManager } from './Manager';
 
 export default class ConsoleViewProvider implements vscode.WebviewViewProvider {
   private webviewView: vscode.WebviewView;
+  private lastLogEntries: any[] = [];
 
   constructor(private context: vscode.ExtensionContext) {
     const { cdpClient } = ViewProviderManager.GetOrCreateSceneViewProvider();
     cdpClient.rootSession.api.Log.onEntryAdded((params) => {
-      this.webviewView.webview.postMessage(params.entry);
+      this.lastLogEntries.push(params.entry);
+      this.webviewView.webview.postMessage({
+        command: 'logEntryAdded',
+        args: [params.entry],
+      });
     });
   }
 
@@ -51,5 +56,10 @@ export default class ConsoleViewProvider implements vscode.WebviewViewProvider {
 </body>
 </html>
     `
+  }
+
+  clear() {
+    this.lastLogEntries = [];
+    this.webviewView.webview.postMessage({ command: 'clear' });
   }
 }

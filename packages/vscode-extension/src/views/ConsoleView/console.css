@@ -1,0 +1,33 @@
+html, body {
+  padding: 0;
+  margin: 0;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding: 0;
+}
+
+#logs {
+  list-style: none;
+  padding: 5px;
+  margin: 0;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.5em;
+}
+#logs > li {
+  padding: 3px 10px;
+  margin: 2px 0;
+  border-radius: 3px;
+}
+#logs > li.error {
+  color: #ff0000;
+  background-color: #ffe6e610;
+}
+#logs > li.warning {
+  color: #ff9900;
+  background-color: #fffbe610;
+}
