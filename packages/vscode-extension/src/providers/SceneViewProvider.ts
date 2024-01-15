@@ -114,9 +114,10 @@ export default class SceneViewProvider extends EventTarget {
       }
     });
 
-    const sourceFilesWatcher = vscode.workspace.onDidSaveTextDocument(() => {
-      this.reload();
-    });
+    // Create a watcher to reload the scene view when the source file is saved.
+    const sourceFilesWatcher = vscode.workspace.onDidSaveTextDocument(() => this.reload());
+
+    // Panel `dispose` event.
     this.panel.onDidDispose(() => {
       sourceFilesWatcher.dispose();
       this.panel = null;

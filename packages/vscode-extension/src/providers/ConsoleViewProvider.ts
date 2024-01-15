@@ -1,10 +1,16 @@
 import * as vscode from 'vscode';
+import type SceneViewProvider from './SceneViewProvider';
 import { ViewProviderManager } from './Manager';
 
 export default class ConsoleViewProvider implements vscode.WebviewViewProvider {
   private webviewView: vscode.WebviewView;
 
-  constructor(private context: vscode.ExtensionContext) { }
+  constructor(private context: vscode.ExtensionContext) {
+    const { cdpClient } = ViewProviderManager.GetOrCreateSceneViewProvider();
+    cdpClient.rootSession.api.Log.onEntryAdded((params) => {
+      this.webviewView.webview.postMessage(params.entry);
+    });
+  }
 
   resolveWebviewView(
     webviewView: vscode.WebviewView,
@@ -19,24 +25,6 @@ export default class ConsoleViewProvider implements vscode.WebviewViewProvider {
     };
     webview.html = this.getWebviewContent(entryUri);
     this.webviewView = webviewView;
-
-    let isLogEntryWatched = false;
-    this.webviewView.webview.onDidReceiveMessage(async (message) => {
-      if (message?.command === 'ready') {
-        const sceneViewProvider = ViewProviderManager.GetSceneViewProvider();
-        if (sceneViewProvider) {
-          const { cdpClient } = sceneViewProvider;
-          if (!isLogEntryWatched) {
-            cdpClient.rootSession.api.Log.onEntryAdded((params) => {
-              webview.postMessage(params.entry);
-            });
-            isLogEntryWatched = true;
-          }
-          await cdpClient.rootSession.api.Log.enable();
-          console.info(`Start listening to console logs`);
-        }
-      }
-    });
   }
 
   getWebviewContent(scriptUri: vscode.Uri): string {

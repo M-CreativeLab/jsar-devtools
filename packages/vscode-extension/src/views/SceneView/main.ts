@@ -433,6 +433,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentDom = new JSARDOM(code, {
       url: urlBase,
       nativeDocument,
+      devtools: {
+        log: true,
+      }
     });
 
     await currentDom.load();
