@@ -70,6 +70,8 @@ export default class ConsoleViewProvider implements vscode.WebviewViewProvider {
 
   clear() {
     this.lastLogEntries = [];
-    this.webviewView.webview.postMessage({ command: 'clear' });
+    if (this.webviewView) {
+      this.webviewView.webview.postMessage({ command: 'clear' });
+    }
   }
 }
