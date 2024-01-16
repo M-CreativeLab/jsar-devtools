@@ -35,9 +35,9 @@ jobs:
         npx vsce package
         ls -lsh ./
     - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            packages/vscode-extension/*.vsix
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ steps.build-release.outputs.release_version }}
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          packages/vscode-extension/*.vsix
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        tag_name: ${{ steps.build-release.outputs.release_version }}
