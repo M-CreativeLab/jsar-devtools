@@ -25,7 +25,8 @@ jobs:
         registry-url: 'https://registry.npmjs.org'
     - name: Install Node.js dependencies
       run: npm install
-    - name: Build release ${{ github.event.inputs.version }}
+    - name: Build release
+      id: build-release
       working-directory: packages/vscode-extension
       run: |
         if [ "${{ github.event.inputs.isRelease }}" != "yes" ]; then
@@ -33,8 +34,10 @@ jobs:
         fi
         npx vsce package
         ls -lsh ./
-    - name: Upload release to artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: jsar-devtools
-        path: 'packages/vscode-extension/*.vsix'
+    - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            packages/vscode-extension/*.vsix
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ steps.build-release.outputs.release_version }}

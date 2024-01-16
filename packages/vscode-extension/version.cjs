@@ -22,3 +22,6 @@ fs.writeFileSync('./package.json', JSON.stringify({
 
 console.log(
   `package.json is updated`, fs.readFileSync('./package.json', 'utf-8'));
+
+// Update in Github Action
+console.info('::set-output name=release_version::' + newVersion);
