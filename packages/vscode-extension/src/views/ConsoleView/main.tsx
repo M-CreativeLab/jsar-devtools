@@ -28,6 +28,16 @@ function argToValue(arg) {
   ) {
     return arg.value;
   }
+  if (arg.type === 'object') {
+    try {
+      if (arg.className === 'URL') {
+        return new URL(arg.value);
+      }
+    } catch (err) {
+      // ignore
+    }
+    return arg.value;
+  }
 }
 
 function App() {
@@ -51,7 +61,7 @@ function App() {
     return {
       id: `${log.timestamp}-${i}`,
       method: log.level,
-      data: [log.text].concat(argToValue(log.args)),
+      data: [log.text].concat(log.args.map(argToValue)),
     } as Message;
   });
   return <div id="app">
