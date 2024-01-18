@@ -54,6 +54,9 @@ class HeadlessResourceLoader implements ResourceLoader {
     }
     return fetch(url, options)
       .then((resp) => {
+        if (!resp.ok) {
+          throw new Error(`Failed to fetch ${url}`);
+        }
         if (returnsAs === 'string') {
           return resp.text();
         } else if (returnsAs === 'json') {
@@ -215,7 +218,7 @@ class NativeDocumentOnBabylonjs extends EventTarget implements NativeDocument {
     camera.lowerRadiusLimit = 2;
     camera.wheelDeltaPercentage = 0.01;
 
-    camera.setPosition(new BABYLON.Vector3(0, 0, -2.5));
+    camera.setPosition(new BABYLON.Vector3(0, 1, -2.5));
     camera.setTarget(BABYLON.Vector3.Zero());
 
     const light = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(0, 2, -5), this._scene);
