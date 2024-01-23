@@ -238,7 +238,6 @@
     "@gltf-transform/extensions": "^3.5.1",
     "@vscode/l10n": "^0.0.16",
     "@vscode/webview-ui-toolkit": "^1.2.2",
-    "@yodaos-jsar/dom": "^0.3.1-alpha.20240122.1705918165751",
     "antd": "^5.8.6",
     "bootstrap": "^5.3.2",
     "draco3dgltf": "^1.5.6",
