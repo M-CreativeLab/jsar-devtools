@@ -85,6 +85,17 @@ export default class Packager {
     return JSON.parse(jsonText);
   }
 
+  #getVersionCode(): number {
+    const pkgVersion = this.#packageJson.version;
+    if (!pkgVersion) {
+      throw new TypeError(`package.json must contain a "version" field.`);
+    }
+    const [ major, minor, patch ] = pkgVersion.split('.')
+      .map(v => parseInt(v))
+      .map(v => isNaN(v) ? 0 : v);
+    return major * 1000000 + minor * 1000 + patch;
+  }
+
   async pack(onProgressChange?: (progress: number, message: string) => void) {
     if (typeof onProgressChange !== 'function') {
       onProgressChange = () => { };
@@ -127,11 +138,30 @@ export default class Packager {
         const fileOrDir = await fs.promises.stat(filename);
         const name = filename.replace(this.#projectRoot, '');
         if (fileOrDir.isFile()) {
-          // append the file.
-          this.#outArchive.file(filename, {
-            name,
-            stats: fileOrDir,
-          });
+          if (name === '/package.json') {
+            // append the package.json.
+            this.#outArchive.append(
+              JSON.stringify(
+                {
+                  ...packageJson,
+                  jsar: {
+                    versionCode: this.#getVersionCode(),
+                  },
+                },
+                null,
+                2
+              ),
+              {
+                name,
+                stats: fileOrDir,
+              });
+          } else {
+            // append the file.
+            this.#outArchive.file(filename, {
+              name,
+              stats: fileOrDir,
+            });
+          }
 
           // append the md5 hash of this file.
           const fileMD5 = await this.#calculateFileMD5(filename);
