@@ -1,6 +1,6 @@
 # JSAR DevTools
 
-The Development Tools for [JSAR][https://github.com/M-CreativeLab/jsar-dom] application.
+The Development Tools for [JSAR][] application.
 
 It included:
 
@@ -14,3 +14,5 @@ Go https://marketplace.visualstudio.com/items?itemName=RokidMCreativeLab.vscode-
 ## License
 
 [Apache-2.0](./LICENSE)
+
+[JSAR]: https://github.com/M-CreativeLab/jsar-dom
