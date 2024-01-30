@@ -33,6 +33,8 @@ jobs:
       run: |
         if [ "${{ github.event.inputs.isRelease }}" != "yes" ]; then
           node ./version.cjs
+        else
+          node ./version.cjs --release
         fi
         npx vsce package
         ls -lsh ./

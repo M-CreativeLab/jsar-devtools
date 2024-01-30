@@ -10,18 +10,24 @@ function getFormattedDate(timestamp) {
   return `${year}${month}${day}`;
 }
 
+const isRelease = process.argv[2] === '--release';
 let { version: baseVersion } = packageJson;
 baseVersion = baseVersion.split('-')[0];
 
-const nowTimestamp = Date.now();
-const newVersion = `${baseVersion}-alpha.${getFormattedDate(nowTimestamp)}.${nowTimestamp}`;
-fs.writeFileSync('./package.json', JSON.stringify({
-  ...packageJson,
-  version: newVersion,
-}, null, 2));
+if (isRelease) {
+  // Update in Github Action
+  console.info('::set-output name=release_version::' + baseVersion);
+} else {
+  const nowTimestamp = Date.now();
+  const newVersion = `${baseVersion}-alpha.${getFormattedDate(nowTimestamp)}.${nowTimestamp}`;
+  fs.writeFileSync('./package.json', JSON.stringify({
+    ...packageJson,
+    version: newVersion,
+  }, null, 2));
 
-console.log(
-  `package.json is updated`, fs.readFileSync('./package.json', 'utf-8'));
+  console.log(
+    `package.json is updated`, fs.readFileSync('./package.json', 'utf-8'));
 
-// Update in Github Action
-console.info('::set-output name=release_version::' + newVersion);
+  // Update in Github Action
+  console.info('::set-output name=release_version::' + newVersion);
+}
