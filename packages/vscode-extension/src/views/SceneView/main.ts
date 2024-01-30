@@ -49,7 +49,7 @@ class HeadlessResourceLoader implements ResourceLoader {
     const urlObj = new URL(url);
     if (urlObj.protocol === 'file:') {
       const vfsUrl = new URL(vfsOrigin);
-      vfsUrl.searchParams.set('path', urlObj.pathname);
+      vfsUrl.searchParams.set('path', decodeURIComponent(urlObj.pathname));
       url = vfsUrl.href;
     }
     return fetch(url, options)
