@@ -144,7 +144,11 @@ export default class Packager {
             this.#outArchive.append(
               JSON.stringify(
                 {
+                  // add the below fields if not present to make sure the IDP file is valid.
+                  copyrights: [],
+                  // just copy the package.json.
                   ...packageJson,
+                  // force write the jsar related fields by packager.
                   jsar: {
                     versionCode: this.#getVersionCode(),
                   },
