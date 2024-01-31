@@ -138,7 +138,8 @@ export default class Packager {
         const fileOrDir = await fs.promises.stat(filename);
         const name = filename.replace(this.#projectRoot, '');
         if (fileOrDir.isFile()) {
-          if (name === '/package.json') {
+          const packageJsonName = process.platform === 'win32' ? '\\package.json' : '/package.json';
+          if (name === packageJsonName) {
             // append the package.json.
             this.#outArchive.append(
               JSON.stringify(
